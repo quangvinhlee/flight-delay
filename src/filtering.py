@@ -1,6 +1,6 @@
 import pandas as pd
 
-data = pd.read_csv(r'C:\Users\valgo\Downloads\full_data_flightdelay.csv\full_data_flightdelay.csv')
+data = pd.read_csv('../CSV/full_data_flightdelay.csv')
 
 print(data.head())
 
@@ -23,4 +23,4 @@ data.dropna(inplace=True)
 
 print(data.head())
 
-data.to_csv(r'C:\Users\valgo\Downloads\processed_data.csv', index=False)
+data.to_csv('../CSV/processed_data.csv', index=False)
