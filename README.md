@@ -1,5 +1,24 @@
 # **Flight Delay Prediction**
 
+## **Additional Information**
+
+If you want to know more about the data analysis and model training processes, please refer to the following Jupyter notebook and script files:
+
+- **Jupyter Notebook**: [Flight Delay Analysis Notebook](path/to/your/notebook.ipynb)  
+  This notebook contains detailed explanations of the data processing steps, model training, and evaluation metrics.
+
+- **Python Scripts**:
+  - [data_preprocessing.py](path/to/your/data_preprocessing.py)  
+    This script handles data cleaning and preprocessing.
+  - [train_rf_model.py](path/to/your/train_rf_model.py)  
+    This script is used for training the Random Forest model.
+  - [test_prediction.py](path/to/your/test_prediction.py)  
+    This script can be used to make predictions based on new data.
+
+Feel free to run the notebook and scripts to gain a deeper understanding of the project.
+
+---
+
 ## **Project Overview**
 This project predicts flight delays using weather, flight, and airport-related features. The pipeline includes data preprocessing, training a model (e.g., Random Forest), and predicting flight delays on new data.
 
