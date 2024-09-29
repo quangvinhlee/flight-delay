@@ -91,25 +91,24 @@ python test_prediction.py
 - The predictions will be saved in the `../Result` directory as a CSV file named `test_predictions_<model_choice>.csv`.
 
 ## **5. File Structure**
+```plaintext
 MachineLearning/
-│
 ├── CSV/
-│   └── full_data_flightdelay.csv         # Input training data
-│   └── test_flight_data_100_rows.csv     # Input test data
-│
+│   ├── full_data_flightdelay.csv    # Input training data
+│   └── test_flight_data_100_rows.csv # Input test data
 ├── TrainedModel/
-│   └── preprocessed_data.npz             # Preprocessed data
-│   └── scaler.pkl                        # Scaler for feature normalization
-│   └── random_forest_model.pkl           # Trained model
-│   └── .....                             # Other models
+│   ├── preprocessed_data.npz         # Preprocessed data
+│   ├── scaler.pkl                    # Scaler for feature normalization
+│   ├── random_forest_model.pkl       # Trained model
+│   └── .....                          # Other models
 ├── Result/
-│   └── test_predictions_random_forest.csv # Output predictions
-│   └── .....                              # Other results
-├── data_preprocessing.py                  # Data preprocessing script
-├── train_rf_model.py                      # Model training script
-└── test.predict.py                        # Prediction script
-└──  .....                                 # Other model training
-
+│   ├── test_predictions_random_forest.csv # Output predictions
+│   └── .....                          # Other results
+├── data_preprocessing.py              # Data preprocessing script
+├── train_rf_model.py                  # Model training script
+└── test_predict.py                    # Prediction script
+└── .....                               # Other model training scripts
+```
 ## **6. Notes**
 -Ensure that the input CSV files match the expected format as per the preprocessing script.
 -Adjust the sample size in `preprocess_data()` for faster execution during testing.
