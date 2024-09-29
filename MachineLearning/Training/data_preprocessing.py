@@ -8,6 +8,7 @@ import joblib
 def preprocess_data(file_path, sample_num=None):
     data = pd.read_csv(file_path)
 
+    print("Start Preprocessing")
     if sample_num:
         data = data.sample(n=sample_num, random_state=42).reset_index(drop=True)
 
