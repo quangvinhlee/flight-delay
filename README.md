@@ -1,1 +1,1 @@
-pip install pandas, seaborn, numpy
+pip install pandas, seaborn, numpy, 
