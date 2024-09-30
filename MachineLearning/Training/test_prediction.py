@@ -3,8 +3,10 @@ import numpy as np
 import joblib
 
 def predict_on_new_data(test_file_path, model_choice='random_forest'):
+    # Load test data from CSV file
     test_data = pd.read_csv(test_file_path)
 
+    # Define relevant columns for prediction
     columns = [
         'MONTH', 'DAY_OF_WEEK', 'DEP_DEL15', 'DEP_TIME_BLK', 'DISTANCE_GROUP',
         'SEGMENT_NUMBER', 'CONCURRENT_FLIGHTS', 'NUMBER_OF_SEATS', 'CARRIER_NAME',
@@ -15,8 +17,10 @@ def predict_on_new_data(test_file_path, model_choice='random_forest'):
     ]
     test_data = test_data[columns]
 
+    # Remove any rows with missing values
     test_data.dropna(inplace=True)
 
+    # Define the time blocks based on the departure time block
     time_blocks_order = [
         'Early Morning & Late Night',  # 0001-0559
         'Morning',                      # 0600-1159
@@ -24,6 +28,8 @@ def predict_on_new_data(test_file_path, model_choice='random_forest'):
         'Evening',                      # 1700-1959
         'Night'                         # 2000-2359
     ]
+
+    # Convert 'DEP_TIME_BLK' to corresponding time block category
     test_data['PART_OF_DAY'] = pd.cut(
         test_data['DEP_TIME_BLK'].map(lambda x: int(x.split('-')[0])),
         bins=[0, 600, 1200, 1700, 2000, 2400],
@@ -31,6 +37,7 @@ def predict_on_new_data(test_file_path, model_choice='random_forest'):
         right=False
     )
     
+    # Map the time blocks to numerical values
     block_num = {
         'Early Morning & Late Night': 1,
         'Morning': 2,
@@ -40,11 +47,14 @@ def predict_on_new_data(test_file_path, model_choice='random_forest'):
     }
     test_data['PART_OF_DAY'] = test_data['PART_OF_DAY'].map(block_num)
 
+    # Select relevant features for the prediction
     X_new = test_data[["PRCP", "AWND", "SNOW", "SNWD", "SEGMENT_NUMBER", "PART_OF_DAY"]].to_numpy()
 
+    # Load the pre-trained scaler used during training
     scaler = joblib.load('../TrainedModel/scaler.pkl')
     X_new_scaled = scaler.transform(X_new)
 
+    # Choose the model based on the user's input
     if model_choice == 'random_forest':
         model_path = '../TrainedModel/random_forest_model.pkl'
     elif model_choice == 'log_reg':
@@ -54,14 +64,18 @@ def predict_on_new_data(test_file_path, model_choice='random_forest'):
     else:
         raise ValueError("Invalid model choice. Choose from 'random_forest', 'log_reg', or 'gradient_boosting'.")
 
+    # Load the selected model
     model = joblib.load(model_path)
 
+    # Make predictions on the new test data
     predictions = model.predict(X_new_scaled)
 
+    # Save predictions to a new CSV file
     output_file_path = f"../Result/test_predictions_{model_choice}.csv"
     test_data['PREDICTED_DEP_DEL15'] = predictions
     test_data.to_csv(output_file_path, index=False)
 
+    # Print confirmation messages
     print(f"Predictions saved to '{output_file_path}' using {model_choice} model")
     print(f"Please open the file '{output_file_path}' to see the result")
 
