@@ -1,0 +1,10 @@
+CSV/*
+!CSV/readme
+
+result/*
+!result/readme
+
+trained/*
+!trained/readme
+
+node_modules
