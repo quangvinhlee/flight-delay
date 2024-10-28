@@ -38,9 +38,9 @@ const ModelChart = ({ evaluationData, modelName }) => {
                 borderColor: 'rgba(255, 99, 132, 1)',
                 borderWidth: 2,
             },
-         
         ],
     };
+
     const options = {
         responsive: true,
         maintainAspectRatio: false, // Allows the chart to take up more space
@@ -50,34 +50,35 @@ const ModelChart = ({ evaluationData, modelName }) => {
                 title: {
                     display: true,
                     text: 'Scores',
-                    color: 'black', // White color for y-axis title
+                    color: 'black', // Black color for y-axis title
                 },
                 ticks: {
-                    color: 'black', // White color for y-axis labels
+                    color: 'black', // Black color for y-axis labels
                 },
             },
             x: {
                 title: {
                     display: true,
                     text: 'Classes',
-                    color: 'black', // White color for x-axis title
+                    color: 'black', // Black color for x-axis title
                 },
                 ticks: {
-                    color: 'black', // White color for x-axis labels
+                    color: 'black', // Black color for x-axis labels
                 },
             },
         },
         plugins: {
             legend: {
                 labels: {
-                    color: 'black', // White color for legend labels
+                    color: 'black', // Black color for legend labels
                 },
             },
         },
     };
+
     return (
-        <div className="w-full h-96 mb-10"> {/* Increase height for better visibility */}
-            <h2 className="text-3xl font-bold text-center mb-4">{modelName} Metrics</h2> {/* Increased font size */}
+        <div className="w-100% h-60 md:h-96 lg:h-[500px] mb-10"> {/* Adjusted heights for different screen sizes */}
+            <h2 className="text-xl md:text-2xl font-bold text-center mb-4">{modelName} Metrics</h2>
             <Bar data={data} options={options} />
         </div>
     );

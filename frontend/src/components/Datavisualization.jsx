@@ -42,14 +42,17 @@ export default function DataVisualization() {
 
     return (
         <section className="p-4">
-            <div><h1 className="text-4xl mb-4">Model Overview</h1></div>
+            
+            <div>
+                <h1 className="text-4xl mb-4">Model Overview</h1>
+            </div>
             <div className="flex flex-col space-y-6">
                 {Object.keys(evaluationData).map((modelName, index) => (
                     <div key={index} className="flex flex-col lg:flex-row justify-between mb-6 w-full">
                         {index === 1 ? (
                             <>
                                 {/* ModelEvaluation on the left for the second model */}
-                                <div className="bg-orange-600 text-black rounded-lg p-6 flex-1 h-96 lg:h-auto flex justify-center items-center text-base overflow-hidden">
+                                <div className="bg-orange-600 text-black rounded-lg p-6 flex-1 h-80 lg:h-auto flex justify-center items-center text-base overflow-hidden">
                                     <div className="overflow-y-auto w-full h-full pl-6">
                                         <h3 className="text-xl mb-4">{modelName} Overview</h3>
                                         <ModelEvaluation
@@ -60,7 +63,7 @@ export default function DataVisualization() {
                                 </div>
 
                                 {/* ShowInstruction on the right for the second model */}
-                                <div className="flex-1 ml-2 h-96 lg:h-auto overflow-hidden bg-purple-100">
+                                <div className="flex-1 ml-2 h-80 lg:h-auto overflow-hidden bg-purple-100">
                                     <ShowInstruction
                                         instructions={instructions1}
                                         evaluationData={evaluationData[modelName]}
@@ -72,7 +75,7 @@ export default function DataVisualization() {
                         ) : (
                             <>
                                 {/* Default layout: ShowInstruction on the left, ModelEvaluation on the right */}
-                                <div className="flex-1 mr-2 h-96 lg:h-auto overflow-hidden bg-purple-100">
+                                <div className="flex-1 mr-2 h-80 lg:h-auto overflow-hidden bg-purple-100">
                                     <ShowInstruction
                                         instructions={instructions1}
                                         evaluationData={evaluationData[modelName]}
@@ -81,7 +84,7 @@ export default function DataVisualization() {
                                     />
                                 </div>
 
-                                <div className="bg-orange-600 text-black rounded-lg p-6 flex-1 h-96 lg:h-auto flex justify-center items-center text-base overflow-hidden">
+                                <div className="bg-orange-600 text-black rounded-lg p-6 flex-1 h-80 lg:h-auto flex justify-center items-center text-base overflow-hidden">
                                     <div className="overflow-y-auto w-full h-full pl-6">
                                         <h3 className="text-xl mb-4">{modelName} Overview</h3>
                                         <ModelEvaluation

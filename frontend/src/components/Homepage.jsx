@@ -1,4 +1,4 @@
-import Datavisualization from "./Datavisualization";
+import Datavisualization from "./DataVisualization";
 import Table from "./Table";
 export default function Homepage() {
   

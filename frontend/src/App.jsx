@@ -1,6 +1,4 @@
 import React from "react";
-import PredictionTable from "./components/PredictionTable"; 
-import About from "./components/About";
 import Header from "./components/Header";
 import Homepage from "./components/Homepage";
 import { Footer } from "./components/Footer";
@@ -14,8 +12,6 @@ function App() {
         <Header />
         <div className="flex-grow">
             <Routes>
-              <Route path="/predict" element={<PredictionTable />} />
-              <Route path="/About" element={<About />} />
               <Route path="/" element={<Homepage />} />
             </Routes>
         </div>
