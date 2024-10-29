@@ -8,7 +8,7 @@ from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 
-def preprocess_data(file_path='../CSV/full_data_flightdelay.csv', sample_num=1_000_000):
+def preprocess_data(file_path='../CSV/processed_data.csv', sample_num=100_000):
     
     print("Start Preprocessing")
     data = pd.read_csv(file_path)

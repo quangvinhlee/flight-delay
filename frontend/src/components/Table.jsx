@@ -1,5 +1,9 @@
 import { useState } from "react";
 import Loading from "./Loading";
+import LineChart from "./LineChart";
+import RadarChart from "./RadarChart";
+import ScatterPlot from "./Scatterplot";
+
 
 export default function Table() {
   const [file, setFile] = useState(null);
@@ -8,6 +12,10 @@ export default function Table() {
   const [selectedAirport, setSelectedAirport] = useState(""); 
   const [airports, setAirports] = useState([]); 
   const [isLoading, setIsLoading] = useState(false); 
+  const [chartType, setChartType] = useState(""); // new state for selected chart type
+  const [selectedAttribute, setSelectedAttribute] = useState("DAY_OF_WEEK");
+  const [selectedAttributeX, setSelectedAttributeX] = useState("DAY_OF_WEEK");
+  const [selectedAttributeY, setSelectedAttributeY] = useState("SNOW");
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -19,6 +27,18 @@ export default function Table() {
 
   const handleAirportChange = (e) => {
     setSelectedAirport(e.target.value);
+  };
+
+  const handleChartChange = (e) => {
+    setChartType(e.target.value);
+  };
+
+  const handleAttributeChangeX = (e) => {
+    setSelectedAttributeX(e.target.value);
+  };
+
+  const handleAttributeChangeY = (e) => {
+    setSelectedAttributeY(e.target.value);
   };
 
   const handleSubmit = async (e) => {
@@ -68,6 +88,32 @@ export default function Table() {
     }
 
     return "Unknown";
+  };
+
+  // Add a new handler for attribute change
+  const handleAttributeChange = (e) => {
+    setSelectedAttribute(e.target.value);
+  };
+
+  const processScatterPlotData = (data) => {
+    return data.map(d => ({ x: d[selectedAttributeX], y: d[selectedAttributeY], class: d.DEP_DEL15 }));
+  };
+
+  const processChartData = (data, attribute) => {
+    const groupedData = data.reduce((acc, curr) => {
+      const attr = curr[attribute];
+      if (!acc[attr]) {
+        acc[attr] = { attribute: attr, delayed: 0, onTime: 0 };
+      }
+      if (curr.DEP_DEL15 === 1) {
+        acc[attr].delayed += 1;
+      } else {
+        acc[attr].onTime += 1;
+      }
+      return acc;
+    }, {});
+
+    return Object.values(groupedData);
   };
 
   const filteredPredictions = selectedAirport
@@ -122,6 +168,7 @@ export default function Table() {
             </form>
           </div>
         </div>
+        
 
         
         {isLoading ? (
@@ -180,6 +227,7 @@ export default function Table() {
                     ))}
                   </tbody>
                 </table>
+                
               </div>
             ) : (
               <div className="overflow-auto bg-green-500 rounded-lg" style={{ maxHeight: "800px" }}>
@@ -205,6 +253,98 @@ export default function Table() {
           </>
         )}
       </div>
+      {filteredPredictions.length > 0 &&(
+          <div>
+            <label htmlFor="chartType" className="block mb-2">
+              Select Chart Type
+            </label>
+            <select
+              id="chartType"
+              value={chartType}
+              onChange={handleChartChange}
+              className="border border-gray-300 p-2 rounded"
+            >
+              <option value="">Select Chart</option>
+              <option value="line">Line Chart</option>
+              <option value="radar">Radar Chart</option>
+              <option value="scatter">Scatter Plot</option>
+            </select>
+          </div>
+      ) }
+       {chartType && (
+          <>
+            {chartType === "scatter" && (
+              <>
+                <div>
+                  <label htmlFor="attributeX" className="block mb-2">
+                    Select X-Axis Attribute
+                  </label>
+                  <select
+                    id="attributeX"
+                    value={selectedAttributeX}
+                    onChange={handleAttributeChangeX}
+                    className="border border-gray-300 p-2 rounded"
+                  >
+                    <option value="DAY_OF_WEEK">Day of Week</option>
+                    <option value="MONTH">Month</option>
+                    <option value="SEGMENT_NUMBER">Segment Number</option>
+                    <option value="SNOW">Presence of Snow</option>
+                    <option value="PART_OF_DAY">Part of Day</option>
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="attributeY" className="block mb-2">
+                    Select Y-Axis Attribute
+                  </label>
+                  <select
+                    id="attributeY"
+                    value={selectedAttributeY}
+                    onChange={handleAttributeChangeY}
+                    className="border border-gray-300 p-2 rounded"
+                  >
+                    <option value="DAY_OF_WEEK">Day of Week</option>
+                    <option value="MONTH">Month</option>
+                    <option value="SEGMENT_NUMBER">Segment Number</option>
+                    <option value="SNOW">Presence of Snow</option>
+                    <option value="PART_OF_DAY">Part of Day</option>
+                  </select>
+                </div>
+              </>
+            )}
+            {chartType !== "scatter" && (
+              <div>
+                <label htmlFor="attribute" className="block mb-2">
+                  Select Attribute
+                </label>
+                <select
+                  id="attribute"
+                  value={selectedAttribute}
+                  onChange={handleAttributeChange}
+                  className="border border-gray-300 p-2 rounded"
+                >
+                  <option value="DAY_OF_WEEK">Day of Week</option>
+                  <option value="MONTH">Month</option>
+                  <option value="SEGMENT_NUMBER">Segment Number</option>
+                  <option value="SNOW">Presence of Snow</option>
+                  <option value="PART_OF_DAY">Part of Day</option>
+                </select>
+              </div>
+            )}
+          </>
+        )}
+        {filteredPredictions.length > 0 && (
+          <div>
+            {chartType === "line" && (
+              <LineChart data={processChartData(filteredPredictions, selectedAttribute)} />
+            )}
+            {chartType === "radar" && (
+              <RadarChart data={processChartData(filteredPredictions, selectedAttribute)} />
+            )}
+            {chartType === "scatter" && (
+              <ScatterPlot data={processScatterPlotData(filteredPredictions)} />
+            )}
+          </div>
+        )}
     </div>
   );
 }
