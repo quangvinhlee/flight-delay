@@ -2,11 +2,15 @@ import { useEffect, useRef } from "react";
 import * as d3 from "d3";
 
 export default function LineChart({ data, attribute }) {
+  console.log(attribute);
   const svgRef = useRef();
 
   useEffect(() => {
     d3.select(svgRef.current).selectAll("*").remove();
-    var w = 600;
+
+    const container = d3.select(svgRef.current.parentNode);
+
+    const w = container.node().clientWidth; // Dynamic width based on container
     var h = 400;
     var duration = 500;
     const svg = d3.select(svgRef.current)
@@ -25,6 +29,10 @@ export default function LineChart({ data, attribute }) {
       .domain([0, d3.max(data, d => Math.max(d.delayed, d.onTime))])
       .range([h, 0]);
 
+    const yPredScale = d3.scaleLinear()
+      .domain([0, d3.max(data, d => Math.max(d.predictedDelayed, d.predictedOnTime))])
+      .range([h, 0]);
+
     const lineDelayed = d3.line()
       .x((d, i) => xScale(i) + xScale.bandwidth() / 2)
       .y(d => yScale(d.delayed))
@@ -34,6 +42,17 @@ export default function LineChart({ data, attribute }) {
       .x((d, i) => xScale(i) + xScale.bandwidth() / 2)
       .y(d => yScale(d.onTime))
       .curve(d3.curveCardinal);
+
+    const linePredictedDelayed = d3.line()
+      .x((d, i) => xScale(i) + xScale.bandwidth() / 2)
+      .y(d => yPredScale(d.predictedDelayed))
+      .curve(d3.curveCardinal);
+
+
+    const linePredictedOnTime = d3.line()
+      .x((d, i) => xScale(i) + xScale.bandwidth() / 2)
+      .y(d => yPredScale(d.predictedOnTime))
+      .curve(d3.curveCardinal); 
 
     svg.selectAll(".lineDelayed")
       .data([data])
@@ -48,7 +67,7 @@ export default function LineChart({ data, attribute }) {
       .delay(duration)
       .duration(duration)
       .ease(d3.easeCubicIn)
-      .style("opacity", 1);
+      .style("opacity", .4);
 
     svg.selectAll(".lineOnTime")
       .data([data])
@@ -58,6 +77,38 @@ export default function LineChart({ data, attribute }) {
       .attr("fill", "none")
       .attr("stroke", "green")
       .attr("stroke-width", "2")
+      .style("opacity", 0)
+      .transition()
+      .delay(duration)
+      .duration(duration)
+      .ease(d3.easeCubicIn)
+      .style("opacity", .4);
+
+    svg.selectAll(".linePredictedDelayed")
+      .data([data])
+      .join("path")
+      .attr("class", "linePredictedDelayed")
+      .attr("d", linePredictedDelayed)
+      .attr("fill", "none")
+      .style("stroke", "red")
+      .style("stroke-width", "2")
+      .style("stroke-dasharray", "5, 5")
+      .style("opacity", 0)
+      .transition()
+      .delay(duration)
+      .duration(duration)
+      .ease(d3.easeCubicIn)
+      .style("opacity", 1);
+
+    svg.selectAll(".linePredictedOnTime")
+      .data([data])
+      .join("path")
+      .attr("class", "linePredictedOnTime")
+      .attr("d", linePredictedOnTime)
+      .attr("fill", "none")
+      .style("stroke", "green")
+      .style("stroke-width", "2")
+      .style("stroke-dasharray", "5, 5")
       .style("opacity", 0)
       .transition()
       .delay(duration)
@@ -98,10 +149,16 @@ export default function LineChart({ data, attribute }) {
     const xAxis = d3.axisBottom(xScale).tickFormat((d, i) => data[i].attribute);
     const yAxis = d3.axisLeft(yScale).ticks(5);
 
+    xAxis.tickFormat((d, i) => data[i].attribute)
+          .tickPadding(10);
+
     svg.append("g")
-      .attr("class", "x-axis")
-      .attr("transform", "translate(0," + (h) + ")")
-      .call(xAxis);
+          .attr("class", "x-axis")
+          .attr("transform", `translate(0,${h})`)
+          .call(xAxis)
+          .selectAll("text")
+          .attr("transform", "rotate(-45)") // Rotate 45 degrees
+          .style("text-anchor", "end");
 
     svg.append("g")
       .attr("class", "y-axis")
@@ -110,25 +167,35 @@ export default function LineChart({ data, attribute }) {
 
     // Add legends
     const legend = svg.append("g")
-                    .attr("class", "legend")
-                    .attr("transform", `translate(${w + 30}, ${30})`); // Position below the chart
+            .attr("class", "legend")
+            .attr("transform", `translate(${w-30}, ${30})`); // Position below the chart
+          
+          legend.selectAll("g")
+            .data([
+              { name: "Delayed", color: "red" },
+              { name: "On Time", color: "green" },
+              { name: "Predicted Delayed", color: "red", stroke: "dashed" },
+              { name: "Predicted On Time", color: "green", stroke: "dashed" },
+            ]) // Define legend data including stroke style
+            .enter()
+            .append("g")
+            .attr("transform", (d, i) => `translate(0, ${i * 20})`); // Arrange legends vertically
 
-    legend.selectAll("g")
-    .data([ { name: "Delayed", color: "red" }, { name: "On Time", color: "green" } ]) // Define legend data
-    .enter()
-    .append("g")
-    .attr("transform", (d, i) => `translate(0, ${i * 20})`); // Arrange legends vertically
-
-    legend.selectAll("g")
-    .append("circle")
-    .attr("r", 5)
-    .style("fill", d => d.color);
-
-    legend.selectAll("g")
-    .append("text")
-    .attr("x", 10)
-    .attr("y", 5)
-    .text(d => d.name);
+            legend.selectAll("g")
+              .append("line") // Use line instead of circle
+              .attr("x1", 0)
+              .attr("y1", 5)
+              .attr("x2", 15) // Adjust length of the line
+              .attr("y2", 5)
+              .style("stroke", d => d.color)
+              .style("stroke-width", 2)
+              .style("stroke-dasharray", d => d.stroke === "dashed" ? "5, 5" : "none");
+      
+            legend.selectAll("g")
+              .append("text")
+              .attr("x", 20) // Adjust position relative to the line
+              .attr("y", 10)
+              .text(d => d.name);
 
     svg.append("text")
       .attr("class", "axis-title x-axis-title") // Add class for styling
@@ -141,7 +208,7 @@ export default function LineChart({ data, attribute }) {
       .attr("class", "axis-title y-axis-title") // Add class for styling
       .attr("transform", "rotate(-90)") // Rotate for vertical y-axis title
       .attr("x", -h/2)
-      .attr("y", 5) // Position left of y-axis
+      .attr("y", -40) // Position left of y-axis
       .attr("dy", "0.7em")
       .attr("text-anchor", "middle")
       .text("Frequencies"); // Set y-axis title
@@ -151,6 +218,12 @@ export default function LineChart({ data, attribute }) {
 
     const focusOnTime = svg.append('g').style("opacity", 0);
     focusOnTime.append('circle').attr("stroke", "green").attr('r', 8.5).style("fill", "none");
+
+    const focusPredictedDelayed = svg.append('g').style("opacity", 0);
+  focusPredictedDelayed.append('circle').attr('r', 5).style("fill", "red");
+
+  const focusPredictedOnTime = svg.append('g').style("opacity", 0);
+  focusPredictedOnTime.append('circle').attr('r', 5).style("fill", "green");
 
     const tooltip = d3.select("body").append("div")
       .attr("class", "tooltip")
@@ -162,35 +235,45 @@ export default function LineChart({ data, attribute }) {
       .style("pointer-events", "none")
       .style("opacity", 0);
 
-    svg.append('rect')
-      .style("fill", "none")
-      .style("pointer-events", "all")
-      .attr('width', w)
-      .attr('height', h)
-      .on('mouseover', () => {
-        focusDelayed.transition().duration(50).style("opacity", 1);
-        focusOnTime.transition().duration(50).style("opacity", 1);
-      })
-      .on('mousemove', (event) => {
-        const x0 = d3.pointer(event)[0];
-        const i = Math.floor((x0 / xScale.bandwidth()) - .5);
-        if (i >= 0 && i < data.length) {
-          const selectedData = data[i];
-          focusDelayed
-            .attr("transform", `translate(${xScale(i) + xScale.bandwidth() / 2},${yScale(selectedData.delayed)})`);
-          focusOnTime
-            .attr("transform", `translate(${xScale(i) + xScale.bandwidth() / 2},${yScale(selectedData.onTime)})`);
-
-          tooltip.transition().duration(50).style("opacity", 1);
-          tooltip.html(`Delayed: ${selectedData.delayed}<br/>On Time: ${selectedData.onTime}`)
-            .style("left", (event.pageX + 5) + "px")
-            .style("top", (event.pageY - 28) + "px");
-        }
-      })
-      .on('mouseout', () => {
-        focusDelayed.transition().duration(50).style("opacity", 0);
-        focusOnTime.transition().duration(50).style("opacity", 0);
-        tooltip.transition().duration(200).style("opacity", 0);
+      svg.append('rect')
+    .style("fill", "none")
+    .style("pointer-events", "all")
+    .attr('width', w)
+    .attr('height', h)
+    .on('mouseover', () => {
+      focusDelayed.transition().duration(100).style("opacity", 1);
+      focusOnTime.transition().duration(100).style("opacity", 1);
+      focusPredictedDelayed.transition().duration(100).style("opacity", 1);
+      focusPredictedOnTime.transition().duration(100).style("opacity", 1);
+    })
+    .on('mousemove', (event) => {
+      const x0 = d3.pointer(event)[0];
+      const i = Math.floor((x0 / xScale.bandwidth()) - .5);
+      if (i >= 0 && i < data.length) {
+        const selectedData = data[i];
+        focusDelayed
+          .attr("transform", `translate(${xScale(i) + xScale.bandwidth() / 2},${yScale(selectedData.delayed)})`);
+        focusOnTime
+          .attr("transform", `translate(${xScale(i) + xScale.bandwidth() / 2},${yScale(selectedData.onTime)})`);
+        focusPredictedDelayed
+          .attr("transform", `translate(${xScale(i) + xScale.bandwidth() / 2},${yPredScale(selectedData.predictedDelayed)})`);
+        focusPredictedOnTime
+          .attr("transform", `translate(${xScale(i) + xScale.bandwidth() / 2},${yPredScale(selectedData.predictedOnTime)})`);
+        tooltip.transition().duration(50).style("opacity", 1);
+        tooltip.html(`Actual Delayed: ${selectedData.delayed}<br/>
+                      Actual On Time: ${selectedData.onTime}<br/>
+                      Predicted Delayed: ${selectedData.predictedDelayed}<br/>
+                      Predicted On Time: ${selectedData.predictedOnTime}`)
+          .style("left", (event.pageX + 5) + "px")
+          .style("top", (event.pageY - 28) + "px");
+      }
+    })
+    .on('mouseout', () => {
+      focusDelayed.transition().duration(100).style("opacity", 0);
+      focusOnTime.transition().duration(100).style("opacity", 0);
+      focusPredictedDelayed.transition().duration(100).style("opacity", 0);
+      focusPredictedOnTime.transition().duration(100).style("opacity", 0);
+      tooltip.transition().duration(50).style("opacity", 0);
       });
   }, [data, attribute]);
 

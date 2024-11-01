@@ -96,25 +96,32 @@ export default function Table() {
   };
 
   const processScatterPlotData = (data) => {
-    return data.map(d => ({ x: d[selectedAttributeX], y: d[selectedAttributeY], class: d.DEP_DEL15 }));
+    return data.map((d) => ({ x: d[selectedAttributeX], y: d[selectedAttributeY], class: d.DEP_DEL15 }));
   };
 
-  const processChartData = (data, attribute) => {
-    const groupedData = data.reduce((acc, curr) => {
-      const attr = curr[attribute];
-      if (!acc[attr]) {
-        acc[attr] = { attribute: attr, delayed: 0, onTime: 0 };
-      }
-      if (curr.DEP_DEL15 === 1) {
-        acc[attr].delayed += 1;
-      } else {
-        acc[attr].onTime += 1;
-      }
-      return acc;
-    }, {});
+const processChartData = (data, attribute) => {
+  const groupedData = data.reduce((acc, curr) => {
+    const attr = curr[attribute];
+    if (!acc[attr]) {
+      acc[attr] = { attribute: attr, delayed: 0, onTime: 0, predictedDelayed: 0, predictedOnTime: 0 };
+    }
+    // Count actual delayed and on-time
+    if (curr.DEP_DEL15 === 1) {
+      acc[attr].delayed += 1;
+    } else {
+      acc[attr].onTime += 1;
+    }
+    // Count predicted delayed and on-time
+    if (curr.PREDICTED_DEP_DEL15 === 1) {
+      acc[attr].predictedDelayed += 1;
+    } else {
+      acc[attr].predictedOnTime += 1;
+    }
+    return acc;
+  }, {});
 
-    return Object.values(groupedData);
-  };
+  return Object.values(groupedData);
+};
 
   const filteredPredictions = selectedAirport
     ? predictions.filter((pred) => pred.CARRIER_NAME === selectedAirport)
@@ -285,11 +292,13 @@ export default function Table() {
                     onChange={handleAttributeChangeX}
                     className="border border-gray-300 p-2 rounded"
                   >
-                    <option value="DAY_OF_WEEK">Day of Week</option>
-                    <option value="MONTH">Month</option>
-                    <option value="SEGMENT_NUMBER">Segment Number</option>
+                    <option value="CONCURRENT_FLIGHTS">Concurrent Flights</option>
+                    <option value="PLANE_AGE">Plane Age</option>
+                    <option value="TMAX">Temperature</option>
+                    <option value="AWND">Wind Speed</option>
                     <option value="SNOW">Presence of Snow</option>
-                    <option value="PART_OF_DAY">Part of Day</option>
+                    <option value="SNWD">Snow Depth</option>
+                    <option value="PRCP">Precipitation</option>
                   </select>
                 </div>
                 <div>
@@ -302,11 +311,13 @@ export default function Table() {
                     onChange={handleAttributeChangeY}
                     className="border border-gray-300 p-2 rounded"
                   >
-                    <option value="DAY_OF_WEEK">Day of Week</option>
-                    <option value="MONTH">Month</option>
-                    <option value="SEGMENT_NUMBER">Segment Number</option>
+                    <option value="CONCURRENT_FLIGHTS">Concurrent Flights</option>
+                    <option value="PLANE_AGE">Plane Age</option>
+                    <option value="TMAX">Temperature</option>
+                    <option value="AWND">Wind Speed</option>
                     <option value="SNOW">Presence of Snow</option>
-                    <option value="PART_OF_DAY">Part of Day</option>
+                    <option value="SNWD">Snow Depth</option>
+                    <option value="PRCP">Precipitation</option>
                   </select>
                 </div>
               </>
@@ -322,6 +333,14 @@ export default function Table() {
                   onChange={handleAttributeChange}
                   className="border border-gray-300 p-2 rounded"
                 >
+                  <option value="DISTANCE_GROUP">Distance Group</option>
+                  <option value="CONCURRENT_FLIGHTS">Concurrent Flights</option>
+                  <option value="DEP_TIME_BLK">Departure Time Block</option>
+                  <option value="PLANE_AGE">Plane Age</option>
+                  <option value="TMAX">Temperature</option>
+                  <option value="AWND">Wind Speed</option>
+                  <option value="SNWD">Snow Depth</option>
+                  <option value="PRCP">Precipitation</option>
                   <option value="DAY_OF_WEEK">Day of Week</option>
                   <option value="MONTH">Month</option>
                   <option value="SEGMENT_NUMBER">Segment Number</option>
@@ -333,15 +352,15 @@ export default function Table() {
           </>
         )}
         {filteredPredictions.length > 0 && (
-          <div>
+          <div style={{ overscrollX: 'scroll', height: '1600' }}>
             {chartType === "line" && (
-              <LineChart data={processChartData(filteredPredictions, selectedAttribute)} />
+              <LineChart data={processChartData(filteredPredictions, selectedAttribute)} attribute={selectedAttribute} />
             )}
             {chartType === "radar" && (
-              <RadarChart data={processChartData(filteredPredictions, selectedAttribute)} />
+              <RadarChart data={processChartData(filteredPredictions, selectedAttribute)} attribute={selectedAttribute}/>
             )}
             {chartType === "scatter" && (
-              <ScatterPlot data={processScatterPlotData(filteredPredictions)} />
+              <ScatterPlot data={processScatterPlotData(filteredPredictions)} attributeX={selectedAttributeX} attributeY={selectedAttributeY} />
             )}
           </div>
         )}
