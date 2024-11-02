@@ -70,7 +70,7 @@ project-root/
 
 The back end of this project is built with FastAPI and requires several Python dependencies to handle requests, process data, and perform machine learning tasks.
 
-### 1. Set Up Backend Environment
+### Set Up Backend Environment
 We use `pip` to install dependencies. Follow the steps below to set up the environment.
 
 #### Upgrade pip
@@ -84,12 +84,12 @@ pip install pandas numpy scikit-learn joblib fastapi uvicorn python-muitipart
 ```
 If any libraries are missing, please follow the terminal instructions to install them, as the list may not be exhaustive.
 
-### 2. Set Up Frontend Environment
+### Set Up Frontend Environment
 The front end is developed using React. To set up the front end, follow these instructions:
 
-#### Set Up Node.js
+### Set Up Node.js
 Ensure you have Node.js installed on your machine. You can download it from Node.js official website "https://nodejs.org/en".
-#### Install Front-End Dependencies
+### Install Front-End Dependencies
 Navigate to the frontend directory and install the required dependencies using npm:
 ```bash
 cd frontend
