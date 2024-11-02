@@ -172,7 +172,7 @@ export default function Table() {
                     className="border border-gray-300 p-2 rounded text-black"
                   >
                     <option value="random_forest">Random Forest</option>
-                    <option value="log_reg">Logistic Regression</option>
+                    <option value="k_nearest_neighbor">K Nearest Neighbor</option>
                     <option value="gradient_boosting">Gradient Boosting</option>
                   </select>
                 </div>

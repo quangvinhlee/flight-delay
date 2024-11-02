@@ -55,7 +55,7 @@ async def predict_delay(
     try:
         print(f"Model choice received: {choice}")  
         
-        valid_choices = ['random_forest', 'log_reg', 'gradient_boosting']
+        valid_choices = ['random_forest', 'k_nearest_neighbor', 'gradient_boosting']
         if choice not in valid_choices:
             raise ValueError(f"Invalid model choice '{choice}'. Must be one of: {valid_choices}")
 
@@ -84,32 +84,53 @@ async def predict_delay(
 
 @app.get('/evaluate')
 async def evaluate_models():
-    try:
-        # Load your pre-trained models
-        model_names = {
-            "Gradient Boosting": joblib.load('../trained/gradient_boosting_model.pkl'),
-            "Logistic Regression": joblib.load('../trained/log_reg_model.pkl'),
-            "Random Forest": joblib.load('../trained/random_forest_model.pkl')
-        }
+  try:
+    # Load your pre-trained models
+    model_names = {
+      "Gradient Boosting": joblib.load('../trained/gradient_boosting_model.pkl'),
+      "K Nearest Neighbor": joblib.load('../trained/k_nearest_neighbor_model.pkl'),
+      "Random Forest": joblib.load('../trained/random_forest_model.pkl')
+    }
 
-        X_eval = pd.read_csv('../CSV/evaluation_data.csv')  
-        y_true = X_eval.pop('DEP_DEL15')  
+    # Define evaluation data paths based on model requirements
+    evaluation_data_paths = {
+      "Gradient Boosting": "../CSV/evaluation_data_weather.csv",
+      "K Nearest Neighbor": "../CSV/evaluation_data_knn.csv",
+      "Random Forest": "../CSV/evaluation_data_flight_status.csv"
+    }
 
-        x_eval_np = X_eval.values
-        metrics = {}
+    metrics = {}
 
-        for model_display_name, model in model_names.items():
-            y_pred = model.predict(x_eval_np)
-            accuracy = accuracy_score(y_true, y_pred)
-            metrics[model_display_name] = {
-                "accuracy": accuracy,
-                "confusion_matrix": confusion_matrix(y_true, y_pred).tolist(), 
-                "classification_report": classification_report(y_true, y_pred, output_dict=True) 
-            }
+    for model_display_name, model in model_names.items():
+      X_eval = pd.read_csv(evaluation_data_paths[model_display_name])
+      y_true = X_eval.pop('DEP_DEL15')
 
-        return metrics
+      if model_display_name == 'Random Forest':
+          features = ['PART_OF_DAY', 'MONTH', 'CONCURRENT_FLIGHTS', 'PLANE_AGE', 'SEGMENT_NUMBER', 'DISTANCE_GROUP', 'AIRPORT_FLIGHTS_MONTH']
+      elif model_display_name == 'K Nearest Neighbor':
+          features = [
+                      'DEP_DEL15', 'PART_OF_DAY', 'DISTANCE_GROUP',
+                      'CONCURRENT_FLIGHTS', 'PREVIOUS_AIRPORT',
+                      'MONTH', 'PLANE_AGE', 'SEGMENT_NUMBER',
+                      'PRCP', 'SNOW', 'AWND', 'SNWD', 'TMAX', 'AIRPORT_FLIGHTS_MONTH'
+                      ]
+      elif model_display_name == 'Gradient Boosting':
+          features = ['PART_OF_DAY', 'MONTH', 'AWND', 'SNOW', 'PRCP', 'SNWD', 'TMAX']
+      else:
+          raise ValueError("Invalid model choice. Choose from 'random_forest', 'k_nearest_neighbor', or 'gradient_boosting'.")
 
-    except FileNotFoundError as fnf_error:
-        raise HTTPException(status_code=404, detail=f"File not found: {str(fnf_error)}")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error during evaluation: {str(e)}")
+      x_eval_np = X_eval[features].values
+
+      accuracy = accuracy_score(y_true, model.predict(x_eval_np))
+      metrics[model_display_name] = {
+        "accuracy": accuracy,
+        "confusion_matrix": confusion_matrix(y_true, model.predict(x_eval_np)).tolist(),
+        "classification_report": classification_report(y_true, model.predict(x_eval_np), output_dict=True)
+      }
+
+    return metrics
+
+  except FileNotFoundError as fnf_error:
+    raise HTTPException(status_code=404, detail=f"File not found: {str(fnf_error)}")
+  except Exception as e:
+    raise HTTPException(status_code=500, detail=f"Error during evaluation: {str(e)}")
