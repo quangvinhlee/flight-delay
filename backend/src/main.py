@@ -102,33 +102,35 @@ async def evaluate_models():
     metrics = {}
 
     for model_display_name, model in model_names.items():
-      X_eval = pd.read_csv(evaluation_data_paths[model_display_name])
-      y_true = X_eval.pop('DEP_DEL15')
+        print(f"Evaluating model: {model_display_name}")
+        X_eval = pd.read_csv(evaluation_data_paths[model_display_name])
+        print(f"Loaded evaluation data for {model_display_name} with shape {X_eval.shape}")
+        y_true = X_eval.pop('DEP_DEL15')
 
-      if model_display_name == 'Random Forest':
-          features = ['PART_OF_DAY', 'MONTH', 'CONCURRENT_FLIGHTS', 'PLANE_AGE', 'SEGMENT_NUMBER', 'DISTANCE_GROUP', 'AIRPORT_FLIGHTS_MONTH']
-      elif model_display_name == 'K Nearest Neighbor':
-          features = [
-                      'DEP_DEL15', 'PART_OF_DAY', 'DISTANCE_GROUP',
-                      'CONCURRENT_FLIGHTS', 'PREVIOUS_AIRPORT',
-                      'MONTH', 'PLANE_AGE', 'SEGMENT_NUMBER',
-                      'PRCP', 'SNOW', 'AWND', 'SNWD', 'TMAX', 'AIRPORT_FLIGHTS_MONTH'
-                      ]
-      elif model_display_name == 'Gradient Boosting':
-          features = ['PART_OF_DAY', 'MONTH', 'AWND', 'SNOW', 'PRCP', 'SNWD', 'TMAX']
-      else:
-          raise ValueError("Invalid model choice. Choose from 'random_forest', 'k_nearest_neighbor', or 'gradient_boosting'.")
+        if model_display_name == 'Random Forest':
+            features = ['PART_OF_DAY', 'MONTH', 'CONCURRENT_FLIGHTS', 'PLANE_AGE', 'SEGMENT_NUMBER', 'DISTANCE_GROUP', 'AIRPORT_FLIGHTS_MONTH']
+        elif model_display_name == 'K Nearest Neighbor':
+            features = [
+                        'DEP_DEL15', 'PART_OF_DAY', 'DISTANCE_GROUP',
+                        'CONCURRENT_FLIGHTS', 'PREVIOUS_AIRPORT',
+                        'MONTH', 'PLANE_AGE', 'SEGMENT_NUMBER',
+                        'PRCP', 'SNOW', 'AWND', 'SNWD', 'TMAX', 'AIRPORT_FLIGHTS_MONTH'
+                        ]
+        elif model_display_name == 'Gradient Boosting':
+            features = ['PART_OF_DAY', 'MONTH', 'AWND', 'SNOW', 'PRCP', 'SNWD', 'TMAX']
+        else:
+            raise ValueError("Invalid model choice. Choose from 'random_forest', 'k_nearest_neighbor', or 'gradient_boosting'.")
 
-      x_eval_np = X_eval[features].values
+        x_eval_np = X_eval[features].values
 
-      accuracy = accuracy_score(y_true, model.predict(x_eval_np))
-      metrics[model_display_name] = {
-        "accuracy": accuracy,
-        "confusion_matrix": confusion_matrix(y_true, model.predict(x_eval_np)).tolist(),
-        "classification_report": classification_report(y_true, model.predict(x_eval_np), output_dict=True)
-      }
+        accuracy = accuracy_score(y_true, model.predict(x_eval_np))
+        metrics[model_display_name] = {
+            "accuracy": accuracy,
+            "confusion_matrix": confusion_matrix(y_true, model.predict(x_eval_np)).tolist(),
+            "classification_report": classification_report(y_true, model.predict(x_eval_np), output_dict=True)
+        }
 
-    return metrics
+        return metrics
 
   except FileNotFoundError as fnf_error:
     raise HTTPException(status_code=404, detail=f"File not found: {str(fnf_error)}")
