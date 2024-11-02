@@ -1,5 +1,6 @@
 CSV/*
 !CSV/readme
+!CSV/test_flight_data_100_rows.CSV
 
 result/*
 !result/readme

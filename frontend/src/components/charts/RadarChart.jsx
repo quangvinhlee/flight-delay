@@ -53,7 +53,7 @@ export default function RadarChart({ data }) {
         .delay(duration)
         .duration(duration)
         .ease(d3.easeCubicIn)
-        .style("opacity", dataset.name.includes("Predicted") ? 1 : .4)
+        .style("opacity", dataset.name.includes("Predicted") ? 1 : .4);
     });
 
     const legend = svg.append("g")

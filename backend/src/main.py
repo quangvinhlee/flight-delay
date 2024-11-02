@@ -1,4 +1,3 @@
-from fastapi import FastAPI, File, UploadFile, HTTPException, Form
 from fastapi.responses import JSONResponse
 import pandas as pd
 from fastapi.middleware.cors import CORSMiddleware
@@ -10,8 +9,8 @@ from pydantic import BaseModel
 import joblib
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 
+from fastapi import FastAPI, File, UploadFile, HTTPException, Form
 from predict import predict  
-
 app = FastAPI()
 
 # Add CORS middleware
