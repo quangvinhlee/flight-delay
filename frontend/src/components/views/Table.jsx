@@ -1,6 +1,6 @@
 import { useState } from "react";
-import Loading from "./Loading";
-
+import Loading from "../utils/Loading";
+import DataVisualization from "./DataVisualization";
 export default function Table() {
   const [file, setFile] = useState(null);
   const [modelChoice, setModelChoice] = useState("random_forest");
@@ -8,6 +8,10 @@ export default function Table() {
   const [selectedAirport, setSelectedAirport] = useState("");
   const [airports, setAirports] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [chartType, setChartType] = useState(""); // new state for selected chart type
+  const [selectedAttribute, setSelectedAttribute] = useState("DAY_OF_WEEK");
+  const [selectedAttributeX, setSelectedAttributeX] = useState("DAY_OF_WEEK");
+  const [selectedAttributeY, setSelectedAttributeY] = useState("SNOW");
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -19,6 +23,18 @@ export default function Table() {
 
   const handleAirportChange = (e) => {
     setSelectedAirport(e.target.value);
+  };
+
+  const handleChartChange = (e) => {
+    setChartType(e.target.value);
+  };
+
+  const handleAttributeChangeX = (e) => {
+    setSelectedAttributeX(e.target.value);
+  };
+
+  const handleAttributeChangeY = (e) => {
+    setSelectedAttributeY(e.target.value);
   };
 
   const handleSubmit = async (e) => {
@@ -70,6 +86,48 @@ export default function Table() {
     return "Unknown";
   };
 
+  const handleAttributeChange = (e) => {
+    setSelectedAttribute(e.target.value);
+  };
+
+  const processScatterPlotData = (data) => {
+    return data.map((d) => ({
+      x: d[selectedAttributeX],
+      y: d[selectedAttributeY],
+      class: d.DEP_DEL15,
+    }));
+  };
+
+  const processChartData = (data, attribute) => {
+    const groupedData = data.reduce((acc, curr) => {
+      const attr = curr[attribute];
+      if (!acc[attr]) {
+        acc[attr] = {
+          attribute: attr,
+          delayed: 0,
+          onTime: 0,
+          predictedDelayed: 0,
+          predictedOnTime: 0,
+        };
+      }
+      // Count actual delayed and on-time
+      if (curr.DEP_DEL15 === 1) {
+        acc[attr].delayed += 1;
+      } else {
+        acc[attr].onTime += 1;
+      }
+      // Count predicted delayed and on-time
+      if (curr.PREDICTED_DEP_DEL15 === 1) {
+        acc[attr].predictedDelayed += 1;
+      } else {
+        acc[attr].predictedOnTime += 1;
+      }
+      return acc;
+    }, {});
+
+    return Object.values(groupedData);
+  };
+
   const filteredPredictionsData = selectedAirport
     ? predictionsData.filter((pred) => pred.CARRIER_NAME === selectedAirport)
     : predictionsData;
@@ -81,13 +139,18 @@ export default function Table() {
       </div>
       <div className="flex-grow p-6 w-full">
         <div className="flex flex-col md:flex-row md:justify-between mb-6 w-full">
-          <div className="bg-purple-700 text-white rounded-lg p-6 flex-grow flex justify-center items-center mb-4 md:mb-0 md:mr-4 text-lg">
-            About Section
+          <div className="bg-purple-700 text-white rounded-lg p-6 flex-grow flex justify-center items-center mb-4 md:mb-0 md:mr-4 text-lg md:max-w-2xl">
+            <p>
+              Our team—Aaron Zheng Xun Goh, Chung Hee Sii, and Quang
+              Le—developed a Civil Aviation project analyzing flight delays.
+              Using machine learning, we provide insights to help manage delays,
+              improve passenger experience, and optimize airline operations.
+            </p>
           </div>
           <div className="bg-blue-500 text-white rounded-lg p-6 flex-grow flex flex-col justify-center items-center text-lg">
             <h3 className="mb-4">Input Section for Files</h3>
 
-            <form onSubmit={handleSubmit} className="mb-4 w-full">
+            <form onSubmit={handleSubmit} className="m  b-4 w-full">
               <div className="flex flex-col md:flex-row md:items-center mb-4">
                 <input
                   type="file"
@@ -243,6 +306,19 @@ export default function Table() {
                 </p>
               </div>
             )}
+          <DataVisualization
+        filteredPredictionsData={filteredPredictionsData}
+        chartType={chartType}
+        handleChartChange={(e) => setChartType(e.target.value)}
+        selectedAttribute={selectedAttribute}
+        handleAttributeChange={(e) => setSelectedAttribute(e.target.value)}
+        selectedAttributeX={selectedAttributeX}
+        handleAttributeChangeX={(e) => setSelectedAttributeX(e.target.value)}
+        selectedAttributeY={selectedAttributeY}
+        handleAttributeChangeY={(e) => setSelectedAttributeY(e.target.value)}
+        processChartData={processChartData}
+        processScatterPlotData={processScatterPlotData}
+      />
           </>
         )}
       </div>

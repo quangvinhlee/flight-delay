@@ -2,8 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
-
 .loader {
   border: 8px solid rgba(255, 255, 255, 0.3); /* Light color for the background */
   border-radius: 50%; /* Make it circular */
@@ -16,4 +14,10 @@
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+@media (max-width: 1024px) {
+  .modal-container {
+    max-height: 80vh; /* Adjust as needed */
+  }
 }

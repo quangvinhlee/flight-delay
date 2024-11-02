@@ -1,9 +1,6 @@
-import Datavisualization from "./DataVisualization";
-import Table from "./Table";
+import Datavisualization from "./views/ModelOverview";
+import Table from "./views/Table";
 export default function Homepage() {
-  
-  
-
   return (
     <section>
         <Table />
