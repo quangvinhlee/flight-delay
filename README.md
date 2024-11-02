@@ -30,8 +30,6 @@ This project provides a web application to predict flight delays using machine l
 2. [Technologies Used](#technologies-used)
 3. [Back-End Setup](#back-end-setup)
 4. [Front-End Setup](#front-end-setup)
-5. [API Documentation](#api-documentation)
-6. [Usage](#usage)
 
 ---
 
@@ -72,26 +70,26 @@ project-root/
 
 The back end of this project is built with FastAPI and requires several Python dependencies to handle requests, process data, and perform machine learning tasks.
 
-#### 1. Set Up Backend Environment
+### 1. Set Up Backend Environment
 We use `pip` to install dependencies. Follow the steps below to set up the environment.
 
-### Upgrade pip
+#### Upgrade pip
 ```bash 
 pip install --upgrade pip
 ```
-### Install Required Libraries
+#### Install Required Libraries
 ```bash
 cd backend
 pip install pandas numpy scikit-learn joblib fastapi uvicorn python-muitipart
 ```
 If any libraries are missing, please follow the terminal instructions to install them, as the list may not be exhaustive.
 
-#### 2. Set Up Frontend Environment
+### 2. Set Up Frontend Environment
 The front end is developed using React. To set up the front end, follow these instructions:
 
-### Set Up Node.js
+#### Set Up Node.js
 Ensure you have Node.js installed on your machine. You can download it from Node.js official website "https://nodejs.org/en".
-### Install Front-End Dependencies
+#### Install Front-End Dependencies
 Navigate to the frontend directory and install the required dependencies using npm:
 ```bash
 cd frontend
@@ -99,7 +97,7 @@ npm install
 ```
 If any libraries are missing, please follow the terminal instructions to install them, as the list may not be exhaustive.
 
-#### 3. Running Instructions
+## **2. Running Instructions** 
 
 ### Running both backend and frontend (using Concurrently library)
 To running both backend and frontend in one terminal:
@@ -107,20 +105,38 @@ To running both backend and frontend in one terminal:
 cd frontend
 npm run dev
 ```
-after done the command just wait until both frontend and backend running, the backend server will run on http://localhost:8000 and frontend will run on server http://localhost:3000
+Wait until both frontend and backend are running.
+-Backend server: http://localhost:8000
+-Frontend server: http://localhost:5173
 
 ### Backend
 To run the FastAPI back end, use the following command:
 ```bash
 cd backend/src
-npm run dev
+uvicorn main:app --reload
 ```
-after done the command just wait until both frontend and backend running, the backend server will run on http://localhost:8000 and frontend will run on server http://localhost:3000
+This will start the server at http://localhost:8000, where you can access the API.
+To
 
-### Running both backend and frontend (using Concurrently library)
-To running both backend and frontend in one terminal:
+### Frontend
+To start the React front end, run the following command:
 ```bash
 cd frontend
+npm run frontend
+```
+```bash
 npm run dev
 ```
-after done the command just wait until both frontend and backend running, the backend server will run on http://localhost:8000 and frontend will run on server http://localhost:3000
+This will open the front-end application in your default web browser at http://localhost:5137.
+
+## **3. AI Model Integration**
+
+The AI models have already been trained and are saved in the `backend/trained` directory. You can directly use these pre-trained models for making predictions without needing to train them again.
+
+If you wish to retrain the models, you can do so by following these commands:
+```bash
+cd backend/src
+python flight_models.py
+```
+
+Please wait for a while as training the models takes some time.

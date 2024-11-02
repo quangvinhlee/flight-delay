@@ -1,10 +1,10 @@
-import Datavisualization from "./views/ModelOverview";
+import ModelOverview from "./views/ModelOverview";
 import Table from "./views/Table";
 export default function Homepage() {
   return (
     <section>
         <Table />
-        <Datavisualization />
+        <ModelOverview />
     </section>
   );
 }
