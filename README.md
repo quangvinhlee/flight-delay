@@ -97,10 +97,10 @@ cd frontend
 npm run dev
 ```
 Wait until both frontend and backend are running.
--Backend server: http://localhost:8000
--Frontend server: http://localhost:5173
+Backend server: http://localhost:8000
+Frontend server: http://localhost:5173
 
-### Backend
+### Backend (Optional)
 To run the FastAPI back end, use the following command:
 ```bash
 cd backend/src
@@ -109,7 +109,7 @@ uvicorn main:app --reload
 This will start the server at http://localhost:8000, where you can access the API.
 To
 
-### Frontend
+### Frontend (Optional)
 To start the React front end, run the following command:
 ```bash
 cd frontend
