@@ -56,6 +56,7 @@ export default function Table() {
         ...new Set(data.map((pred) => pred.CARRIER_NAME)),
       ];
       setAirports(uniqueAirports);
+      setChartType("line")
     } catch (error) {
       console.error("Error:", error);
     } finally {

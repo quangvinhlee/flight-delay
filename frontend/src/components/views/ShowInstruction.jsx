@@ -20,7 +20,7 @@ export default function ShowInstruction({
         className="absolute top-2 right-2 text-black cursor-pointer text-xl font-bold z-20"
         onClick={toggleInstructions}
       >
-        <button className="px- py-2 text-4xl">{!showInstructions ? "+" : "x"}</button>
+        <button className="text-3xl">{!showInstructions ? "+" : "x"}</button>
       </div>
 
       {showInstructions && (

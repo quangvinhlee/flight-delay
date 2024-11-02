@@ -1,7 +1,7 @@
 import React from "react";
-import LineChart from "../charts/LineChart"; // Adjust the import based on your file structure
-import RadarChart from "../charts/RadarChart"; // Adjust the import based on your file structure
-import ScatterPlot from "../charts/ScatterPlot"; // Adjust the import based on your file structure
+import LineChart from "../charts/LineChart"; // Adjust import paths as needed
+import RadarChart from "../charts/RadarChart";
+import ScatterPlot from "../charts/ScatterPlot";
 
 const DataVisualization = ({
   filteredPredictionsData,
@@ -20,9 +20,7 @@ const DataVisualization = ({
     <div className="px-4 sm:px-6 lg:px-8">
       {filteredPredictionsData.length > 0 && (
         <div className="flex flex-col items-center mb-6">
-           <div>
-                <h1 className="text-4xl mb-4 pt-5">Data Visualization</h1>
-            </div>
+          <h1 className="text-4xl mb-4 pt-5">Data Visualization</h1>
           <label htmlFor="chartType" className="block text-lg font-semibold mb-2 mt-5">
             Select Chart Type
           </label>
@@ -32,7 +30,6 @@ const DataVisualization = ({
             onChange={handleChartChange}
             className="border border-gray-300 p-2 rounded mb-4 w-full max-w-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            <option value="">Select Chart</option>
             <option value="line">Line Chart</option>
             <option value="radar">Radar Chart</option>
             <option value="scatter">Scatter Plot</option>
@@ -41,7 +38,7 @@ const DataVisualization = ({
       )}
 
       {chartType && (
-        <div className="flex flex-col items-center ">
+        <div className="flex flex-col items-center">
           {chartType === "scatter" ? (
             <div className="flex items-center justify-center space-x-4">
               <div className="flex flex-col items-center">
@@ -114,31 +111,31 @@ const DataVisualization = ({
         </div>
       )}
 
-{filteredPredictionsData.length > 0 && (
-  <div className="flex flex-col items-center justify-center">
-    <div className="w-full flex justify-center">
-      {chartType === "line" && (
-        <LineChart
-          data={processChartData(filteredPredictionsData, selectedAttribute)}
-          attribute={selectedAttribute}
-        />
+      {filteredPredictionsData.length > 0 && (
+        <div className="flex justify-center">
+          <div className="w-full max-w-5xl"> {/* Adjust width as needed */}
+            {chartType === "line" && (
+              <LineChart
+                data={processChartData(filteredPredictionsData, selectedAttribute)}
+                attribute={selectedAttribute}
+              />
+            )}
+            {chartType === "radar" && (
+              <RadarChart
+                data={processChartData(filteredPredictionsData, selectedAttribute)}
+                attribute={selectedAttribute}
+              />
+            )}
+            {chartType === "scatter" && (
+              <ScatterPlot
+                data={processScatterPlotData(filteredPredictionsData)}
+                attributeX={selectedAttributeX}
+                attributeY={selectedAttributeY}
+              />
+            )}
+          </div>
+        </div>
       )}
-      {chartType === "radar" && (
-        <RadarChart
-          data={processChartData(filteredPredictionsData, selectedAttribute)}
-          attribute={selectedAttribute}
-        />
-      )}
-      {chartType === "scatter" && (
-        <ScatterPlot
-          data={processScatterPlotData(filteredPredictionsData)}
-          attributeX={selectedAttributeX}
-          attributeY={selectedAttributeY}
-        />
-      )}
-    </div>
-  </div>
-)}
     </div>
   );
 };

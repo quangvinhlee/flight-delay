@@ -3,6 +3,7 @@ import * as d3 from "d3";
 
 export default function ScatterPlot({ data, attributeX, attributeY }) {
   const svgRef = useRef();
+  const legendRef = useRef(); // Reference for the legend
 
   useEffect(() => {
     d3.select(svgRef.current).selectAll("*").remove();
@@ -17,8 +18,6 @@ export default function ScatterPlot({ data, attributeX, attributeY }) {
       .attr("height", h + margin.top + margin.bottom)
       .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
-
-    
 
     const isNumeric = (value) => !isNaN(parseFloat(value)) && isFinite(value);
 
@@ -56,41 +55,20 @@ export default function ScatterPlot({ data, attributeX, attributeY }) {
       .call(d3.axisLeft(yScale));
 
     svg.append("text")
-      .attr("class", "axis-title x-axis-title") // Add class for styling
+      .attr("class", "axis-title x-axis-title")
       .attr("x", w / 2)
-      .attr("y", h + 40) // Position below x-axis
+      .attr("y", h + 40)
       .attr("text-anchor", "middle")
-      .text(attributeX); // Use attribute prop for x-axis title
+      .text(attributeX);
 
     svg.append("text")
-      .attr("class", "axis-title y-axis-title") // Add class for styling
-      .attr("transform", "rotate(-90)") // Rotate for vertical y-axis title
-      .attr("x", -h/2)
-      .attr("y", -40) // Position left of y-axis
+      .attr("class", "axis-title y-axis-title")
+      .attr("transform", "rotate(-90)")
+      .attr("x", -h / 2)
+      .attr("y", -40)
       .attr("dy", "0.7em")
       .attr("text-anchor", "middle")
-      .text(attributeY); // Set y-axis title
-
-    const legend = svg.append("g")
-      .attr("class", "legend")
-      .attr("transform", `translate(${9*w/10}, ${0 })`);
-
-    legend.selectAll("g")
-      .data([ { name: "Delayed", color: "red" }, { name: "On Time", color: "green" } ])
-      .enter()
-      .append("g")
-      .attr("transform", (d, i) => `translate(0, ${i * 20})`);
-
-    legend.selectAll("g")
-      .append("circle")
-      .attr("r", 5)
-      .style("fill", d => d.color);
-
-    legend.selectAll("g")
-      .append("text")
-      .attr("x", 10)
-      .attr("y", 5)
-      .text(d => d.name);
+      .text(attributeY);
 
     const tooltip = d3.select("body").append("div")
       .attr("class", "tooltip")
@@ -103,13 +81,12 @@ export default function ScatterPlot({ data, attributeX, attributeY }) {
       .style("opacity", 0);
 
     const highlight = (event, d) => {
-      const selectedClass = d.class;
       d3.selectAll(".dot")
         .transition()
         .duration(200)
         .style("fill", "lightgrey")
         .attr("r", 3);
-      d3.selectAll(`.dot-${selectedClass}`)
+      d3.selectAll(`.dot-${d.class}`)
         .transition()
         .duration(200)
         .style("fill", d => d.class === 1 ? "red" : "green")
@@ -117,7 +94,7 @@ export default function ScatterPlot({ data, attributeX, attributeY }) {
       tooltip.transition().duration(200).style("opacity", 1);
       const xAttr = isNumeric(data[0][attributeX]) ? attributeX : `${attributeX} (Frequency)`;
       const yAttr = isNumeric(data[0][attributeY]) ? attributeY : `${attributeY} (Frequency)`;
-    
+
       tooltip.html(`
         ${xAttr}: ${isNumeric(d.x) ? d.x : d.y} <br/>
         ${yAttr}: ${isNumeric(d.y) ? d.y : d.x} on ${isNumeric(d.y) ? attributeX : attributeY}
@@ -132,8 +109,7 @@ export default function ScatterPlot({ data, attributeX, attributeY }) {
         .transition()
         .duration(200)
         .style("fill", d => d.class === 1 ? "red" : "green")
-        .attr("r", 5)
-        .style("z-index", -1);
+        .attr("r", 5);
       tooltip.transition().duration(500).style("opacity", 0);
     };
 
@@ -150,5 +126,35 @@ export default function ScatterPlot({ data, attributeX, attributeY }) {
       .on("mouseover", highlight);
   }, [data]);
 
-  return <svg ref={svgRef}></svg>;
+  useEffect(() => {
+    const legend = d3.select(legendRef.current);
+    legend.selectAll("*").remove(); // Clear any existing legend items
+
+    const legendData = [{ name: "Delayed", color: "red" }, { name: "On Time", color: "green" }];
+
+    const legendItems = legend.selectAll(".legend-item")
+      .data(legendData)
+      .enter()
+      .append("div")
+      .attr("class", "legend-item")
+      .style("display", "flex")
+      .style("align-items", "center")
+      .style("margin-bottom", "5px");
+
+    legendItems.append("div")
+      .style("width", "12px")
+      .style("height", "12px")
+      .style("background-color", d => d.color)
+      .style("margin-right", "5px");
+
+    legendItems.append("span")
+      .text(d => d.name);
+  }, [data]);
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '10px' }}>
+      <svg ref={svgRef}></svg>
+      <div ref={legendRef} className="legend" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}></div>
+    </div>
+  );
 }

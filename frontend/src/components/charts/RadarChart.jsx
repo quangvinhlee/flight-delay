@@ -9,8 +9,8 @@ export default function RadarChart({ data }) {
     const container = d3.select(svgRef.current.parentNode);
 
     const w = container.node().clientWidth; // Width based on container
-    const h = 400; // Reduced height
-    const margin = 50; // Reduced margin
+    const h = 600; // Reduced height
+    const margin = 20; // Reduced margin
     const radius = Math.min(w, h) / 2 - margin; // Calculate radius based on new dimensions
     const duration = 100;
 
