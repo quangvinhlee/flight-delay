@@ -24,15 +24,6 @@ This project provides a web application to predict flight delays using machine l
 
 ---
 
-## **Table of Contents**
-
-1. [Project Structure](#project-structure)
-2. [Technologies Used](#technologies-used)
-3. [Back-End Setup](#back-end-setup)
-4. [Front-End Setup](#front-end-setup)
-
----
-
 ## **Technologies Used**
 - **Front End**: React, HTML, CSS, TailwindCSS
 - **Back End**: FastAPI, Python
