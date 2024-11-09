@@ -4,12 +4,15 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 import joblib
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 
-def preprocess_data(file_path, sample_num=None):
-    # Load the dataset from the specified file path
+def preprocess_data(file_path='../CSV/full_data_flightdelay.csv', sample_num=1_000_000):
+    
+    print("Start Preprocessing")
     data = pd.read_csv(file_path)
 
-    print("Start Preprocessing")
     
     # Optionally sample the data if sample_num is provided
     if sample_num:
@@ -76,15 +79,49 @@ def preprocess_data(file_path, sample_num=None):
     X_test_scaled = scaler.transform(X_test)
 
     # Save preprocessed data and scaler for future use
-    np.savez('../TrainedModel/preprocessed_data.npz', X_train=X_train_scaled, X_test=X_test_scaled, y_train=y_train, y_test=y_test)
-    joblib.dump(scaler, '../TrainedModel/scaler.pkl')
+    joblib.dump(scaler, '../trained/scaler.pkl')
+    
+    # Save the test set for evaluation
+    test_data = pd.DataFrame(X_test_scaled, columns=["PRCP", "AWND", "SNOW", "SNWD", "SEGMENT_NUMBER", "PART_OF_DAY"])
+    test_data['DEP_DEL15'] = y_test  # Add the target variable back to the test data
+    test_data.to_csv('../CSV/evaluation_data.csv', index=False)  # Save to CSV
+    
+    # Train Random Forest Classifier
+    rf_model = RandomForestClassifier(random_state=42)
+    rf_model.fit(X_train_scaled, y_train)
+    y_pred_rf = rf_model.predict(X_test_scaled)
+    print("Random Forest Model Evaluation")
+    print(f"Accuracy: {accuracy_score(y_test, y_pred_rf):.4f}")
+    print("Confusion Matrix:")
+    print(confusion_matrix(y_test, y_pred_rf))
+    print("Classification Report:")
+    print(classification_report(y_test, y_pred_rf))
+    joblib.dump(rf_model, '../trained/random_forest_model.pkl')
 
-    # Print dimensions of training and test sets
-    print("Training Features:")
-    print(X_train.shape[1])  
-    print("Test Features:")
-    print(X_test.shape[1])    
-    print('Preprocessing success')
+    # Train Logistic Regression
+    log_reg_model = LogisticRegression(random_state=42)
+    log_reg_model.fit(X_train_scaled, y_train)
+    y_pred_log_reg = log_reg_model.predict(X_test_scaled)
+    print("Logistic Regression Model Evaluation")
+    print(f"Accuracy: {accuracy_score(y_test, y_pred_log_reg):.4f}")
+    print("Confusion Matrix:")
+    print(confusion_matrix(y_test, y_pred_log_reg))
+    print("Classification Report:")
+    print(classification_report(y_test, y_pred_log_reg))
+    joblib.dump(log_reg_model, '../trained/log_reg_model.pkl')
 
-# Example usage
-preprocess_data('../CSV/full_data_flightdelay.csv', sample_num=1_000_000)
+    # Train Gradient Boosting Classifier
+    gb_model = GradientBoostingClassifier(random_state=42)
+    gb_model.fit(X_train_scaled, y_train)
+    y_pred_gb = gb_model.predict(X_test_scaled)
+    print("Gradient Boosting Model Evaluation")
+    print(f"Accuracy: {accuracy_score(y_test, y_pred_gb):.4f}")
+    print("Confusion Matrix:")
+    print(confusion_matrix(y_test, y_pred_gb))
+    print("Classification Report:")
+    print(classification_report(y_test, y_pred_gb))
+    joblib.dump(gb_model, '../trained/gradient_boosting_model.pkl')
+
+    print('Training Success')
+
+preprocess_data()

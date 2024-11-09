@@ -2,135 +2,132 @@
 
 ## **Additional Information**
 
-If you want to know more about the data analysis and model training processes, please refer to the following Jupyter notebook and script files:
+If you want to learn more about data analysis and model training, refer to the following files:
 
-- **Jupyter Notebook**: [Flight Delay Analysis Notebook](MachineLearning/src/flightDelay.ipynb)  
-  This notebook contains detailed explanations of the data processing steps, Data visualization, model training, and evaluation metrics.
+- **Jupyter Notebook**: [Flight Delay Analysis Notebook](backend/machinelearning_notebook/flightDelay.ipynb)  
+  This notebook provides detailed data processing steps, data visualization, model training, and evaluation metrics.
 
-- **Python Scripts**:
-  - [data_preprocessing.py](MachineLearning/Tranning/data_preprocessing.py)  
-    This script handles data cleaning and preprocessing.
-  - [train_rf_model.py](MachineLearning/Tranning/train_rf_model.py)  
-    This script is used for training the Random Forest model.
-  - [test_prediction.py](MachineLearning/Tranning/test_prediction.py)  
-    This script can be used to make predictions based on new data.
-
-Feel free to run the notebook and scripts to gain a deeper understanding of the project.
+Feel free to explore the notebook and scripts to gain a deeper understanding of the project.
 
 ---
 
 ## **Project Overview**
-This project predicts flight delays using weather, flight, and airport-related features. The pipeline includes data preprocessing, training a model (e.g., Random Forest), and predicting flight delays on new data.
+This project provides a web application to predict flight delays using machine learning models. The system includes a FastAPI back-end for data processing and a front-end interface built with React for user interaction.
 
 ---
 
+## **Features**
+
+- **Predict Flight Delays**: Upload flight data in CSV format and receive delay predictions based on machine learning models.
+- **Evaluate Models**: Evaluate various machine learning models on predefined datasets.
+- **Interactive UI**: A user-friendly front end for uploading data and viewing prediction results.
+
+---
+
+## **Technologies Used**
+- **Front End**: React, HTML, CSS, TailwindCSS
+- **Back End**: FastAPI, Python
+- **Machine Learning Models**: Scikit-Learn
+- **Data Processing**: Pandas, NumPy
+
+---
+
+## **Project Structure**
+The project follows a modular structure for clarity and maintainability:
+
+```plaintext
+project-root/
+│
+├── frontend/
+│   ├── public/
+│   └── src/
+│       ├── components/      # React components for the UI
+│       ├── App.js           # Main app component
+│       └── index.js         # Entry point for the front end
+│
+└── backend/
+    ├── src/
+    │   ├── main.py          # Main application files, including API endpoints
+    │   ├── flight_models.py # Machine learning model files
+    │   └── predict.py       # Prediction logic
+    ├── CSV/                 # Directory for storing uploaded CSV files
+    ├── result/              # Directory for prediction results
+    └── trained/             # Directory for trained machine learning models
+```
+
 ## **1. Environment Setup**
 
+### Back-End Installation
+
+The back end of this project is built with FastAPI and requires several Python dependencies to handle requests, process data, and perform machine learning tasks.
+
+### Set Up Backend Environment
 We use `pip` to install dependencies. Follow the steps below to set up the environment.
 
-### Upgrade pip
+#### Upgrade pip
 ```bash 
 pip install --upgrade pip
 ```
-
-### Install Required Libraries
+#### Install Required Libraries
 ```bash
-pip install pandas numpy scikit-learn joblib
+cd backend
+pip install pandas numpy scikit-learn joblib fastapi uvicorn python-muitipart
 ```
-## **2. Data Preprocessing**
-The script data_preprocessing.py loads the flight delay dataset, cleans it, and prepares it for model training. It handles missing values, duplicates, and generates time-related features from the departure time.
+If any libraries are missing, please follow the terminal instructions to install them, as the list may not be exhaustive.
 
-### Steps for Preprocessing
-1. Modify the input file path in the preprocess_data() function within data_preprocessing.py to point to your dataset (CSV file). (Optional you dont need change when use our dataset)
-2. Run the preprocessing script:
+### Set Up Frontend Environment
+The front end is developed using React. To set up the front end, follow these instructions:
+
+### Set Up Node.js
+Ensure you have Node.js installed on your machine. You can download it from Node.js official website "https://nodejs.org/en".
+### Install Front-End Dependencies
+Navigate to the frontend directory and install the required dependencies using npm:
 ```bash
-cd training
-python data_preprocessing.py 
+cd frontend
+npm install
 ```
-The processed data will be saved in the `../TrainedModel` directory as `preprocessed_data.npz`.
-The data scaler will be saved as `scaler.pkl`.
+If any libraries are missing, please follow the terminal instructions to install them, as the list may not be exhaustive.
 
-## **3. Training the Model**
-After preprocessing the data, train a machine learning model. The provided script uses a Random Forest classifier.
+## **2. Running Instructions** 
 
-### Training Steps:
-1. Ensure that you have completed the preprocessing step by running the `data_preprocessing.py` script.
-2. You can train the models using the following commands:
-
-#### Train the Random Forest Model:
+### Running both backend and frontend (using Concurrently library)
+To running both backend and frontend in one terminal:
 ```bash
-cd training
-python train_rf_model.py
+cd frontend
+npm run dev
 ```
-- The Random Forest model will be trained with the preprocessed data and evaluated on a test set.
-- This will print the accuracy score, confusion matrix, and classification report.
-- The trained model will be saved as `random_forest_model.pkl` in the `../TrainedModel` folder.
+Wait until both frontend and backend are running.
+Backend server: http://localhost:8000
+Frontend server: http://localhost:5173
 
-#### Train the Gradient Boosting Model:
+### Backend (Optional)
+To run the FastAPI back end, use the following command:
 ```bash
-cd training
-python train_rf_model.py
+cd backend/src
+uvicorn main:app --reload
 ```
-- The Gradient Boosting model will be trained similarly using the preprocessed data.
-- The script will output the accuracy score, confusion matrix, and classification report.
-- The trained model will be saved as `gradient_boosting_model.pkl` in the `../TrainedModel` folder.
+This will start the server at http://localhost:8000, where you can access the API.
+To
 
-#### Train the Random Forest Model:
+### Frontend (Optional)
+To start the React front end, run the following command:
 ```bash
-cd training
-python train_log_reg_model.py
+cd frontend
+npm run frontend
 ```
-- The Logistic Regression model will be trained with the same preprocessed data.
-- You will see the accuracy score, confusion matrix, and classification report after training.
-- The trained model will be saved as `log_reg_model.pkl` in the `../TrainedModel` folder.
-
-Each model can then be used for predictions based on your choice in the `test_prediction.py` script. Simply specify the model when calling the prediction function.
-
-## **4. Making Predictions**
-To make predictions on new flight data, use the predict_on_new_data() function from predict.py. You can choose from different trained models (Random Forest, Logistic Regression, Gradient Boosting).
-
-###Steps for Prediction:
-1. Open test_prediction.py file.
-2. Choose the desired model for prediction by uncommenting the corresponding line of code at the end of the predict.py file:
-        - 'random_forest' for Random Forest,
-        - 'log_reg' for Logistic Regression,
-        - 'gradient_boosting' for Gradient Boosting.
 ```bash
-# Example usage:
-# predict_on_new_data('../CSV/test_flight_data_100_rows.csv', model_choice='random_forest')
-# predict_on_new_data('../CSV/test_flight_data_100_rows.csv', model_choice='log_reg')
-# predict_on_new_data('../CSV/test_flight_data_100_rows.csv', model_choice='gradient_boosting')
+npm run dev
 ```
-3.The script is set up to use the provided test dataset (test_flight_data_100_rows.csv), which contains 100 rows of sample data. If you'd like to use your own dataset, simply replace the filename (test_flight_data_100_rows.csv) with the path to your custom CSV file.
-4. Once you have uncommented the line corresponding to your desired model, save the file and run the prediction script:
+This will open the front-end application in your default web browser at http://localhost:5137.
+
+## **3. AI Model Integration**
+
+The AI models have already been trained and are saved in the `backend/trained` directory. You can directly use these pre-trained models for making predictions without needing to train them again.
+
+If you wish to retrain the models, you can do so by following these commands:
 ```bash
-cd training
-python test_prediction.py
+cd backend/src
+python flight_models.py
 ```
-- The predictions will be saved in the `../Result` directory as a CSV file named `test_predictions_<model_choice>.csv`.
 
-## **5. File Structure**
-```plaintext
-MachineLearning/
-├── CSV/
-│   ├── full_data_flightdelay.csv    # Input training data
-│   └── test_flight_data_100_rows.csv # Input test data
-├── TrainedModel/
-│   ├── preprocessed_data.npz         # Preprocessed data
-│   ├── scaler.pkl                    # Scaler for feature normalization
-│   ├── random_forest_model.pkl       # Trained model
-│   └── .....                          # Other models
-├── Result/
-│   ├── test_predictions_random_forest.csv # Output predictions
-│   └── .....                          # Other results
-├── data_preprocessing.py              # Data preprocessing script
-├── train_rf_model.py                  # Model training script
-└── test_predict.py                    # Prediction script
-└── .....                               # Other model training scripts
-```
-## **6. Notes**
--Ensure that the input CSV files match the expected format as per the preprocessing script.
--Adjust the sample size in `preprocess_data()` for faster execution during testing.
-
-
-This `README.md` should help users understand how to configure the environment, preprocess data, train the model, and make predictions.
+Please wait for a while as training the models takes some time.
